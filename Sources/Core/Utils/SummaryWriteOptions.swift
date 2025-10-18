@@ -8,10 +8,19 @@
 /**
  Options for write operation in the Summary class.
  */
-struct SummaryWriteOptions {
+public struct SummaryWriteOptions {
     /**
      Indicates whether to overwrite all existing content in the summary file with the buffer contents.
      - Default: `false`
      */
-    let overwrite: Bool
+    public let overwrite: Bool
+
+    /**
+     Initializes a new instance of SummaryWriteOptions.
+
+     - Parameter overwrite: Whether to overwrite the file (default: false).
+     */
+    public init(overwrite: Bool = false) {
+        self.overwrite = overwrite
+    }
 }
