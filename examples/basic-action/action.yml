@@ -1,0 +1,56 @@
+name: 'Basic Swift Action'
+description: 'A basic GitHub Action template written in Swift'
+author: 'Your Name'
+
+branding:
+  icon: 'code'
+  color: 'orange'
+
+inputs:
+  name:
+    description: 'Name to greet'
+    required: true
+  greeting:
+    description: 'Custom greeting message'
+    required: false
+    default: 'Hello'
+  verbose:
+    description: 'Enable verbose logging'
+    required: false
+    default: 'false'
+
+outputs:
+  message:
+    description: 'The generated greeting message'
+  timestamp:
+    description: 'Timestamp of execution'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Swift (Ubuntu)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget
+        wget https://download.swift.org/swift-5.9-release/ubuntu2204/swift-5.9-RELEASE/swift-5.9-RELEASE-ubuntu22.04.tar.gz
+        tar xzf swift-5.9-RELEASE-ubuntu22.04.tar.gz
+        sudo mv swift-5.9-RELEASE-ubuntu22.04 /usr/share/swift
+        echo "/usr/share/swift/usr/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Build Action
+      run: |
+        cd ${{ github.action_path }}
+        swift build -c release
+      shell: bash
+
+    - name: Run Action
+      env:
+        INPUT_NAME: ${{ inputs.name }}
+        INPUT_GREETING: ${{ inputs.greeting }}
+        INPUT_VERBOSE: ${{ inputs.verbose }}
+      run: |
+        cd ${{ github.action_path }}
+        swift run -c release
+      shell: bash
