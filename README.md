@@ -1,68 +1,68 @@
 # GitHub Toolkit
 
 [![Swift](https://img.shields.io/badge/Swift-5.8+-orange.svg)](https://swift.org)
-[![Platforms](https://img.shields.io/badge/Platforms-iOS%2016%2B%20|%20macOS%2010.13%2B-blue.svg)](https://swift.org)
+[![Platforms](https://img.shields.io/badge/Platforms-iOS%2016%2B%20|%20macOS%2012.0%2B-blue.svg)](https://swift.org)
 [![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
 
-Un SDK completo de Swift para interactuar con la API de GitHub y construir GitHub Actions personalizadas.
+A comprehensive Swift SDK for interacting with the GitHub API and building custom GitHub Actions.
 
-## Características
+## Features
 
-- **API REST de GitHub**: Cliente completo con 39+ endpoints organizados en 18 categorías
-- **GitHub Actions Core**: Toolkit completo para construir GitHub Actions en Swift
-- **Modelos de Datos**: 63+ modelos Codable para todas las entidades de GitHub
-- **Async/Await**: API moderna con soporte completo para concurrencia
-- **Type-Safe**: Enums y tipos fuertes para prevenir errores
-- **Cross-Platform**: Compatible con iOS 16+ y macOS 10.13+
+- **GitHub REST API**: Complete client with 39+ endpoints organized in 18 categories
+- **GitHub Actions Core**: Complete toolkit for building GitHub Actions in Swift
+- **Data Models**: 63+ Codable models for all GitHub entities
+- **Async/Await**: Modern API with full concurrency support
+- **Type-Safe**: Strong enums and types to prevent errors
+- **Cross-Platform**: Compatible with iOS 16+ and macOS 12.0+
 
-## Instalación
+## Installation
 
 ### Swift Package Manager
 
-Agrega el paquete a tu `Package.swift`:
+Add the package to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/tu-usuario/github-toolkit.git", from: "1.0.0")
+    .package(url: "https://github.com/devswiftzone/github-toolkit.git", from: "1.0.0")
 ]
 ```
 
-O en Xcode: File → Add Package Dependencies → Ingresa la URL del repositorio
+Or in Xcode: File → Add Package Dependencies → Enter the repository URL
 
-## Uso
+## Usage
 
-### API de GitHub
+### GitHub API
 
-#### Inicialización
+#### Initialization
 
 ```swift
 import Github
 
-// Con token de acceso personal
-let github = GitHub(accessToken: "ghp_tu_token_aquí")
+// With personal access token
+let github = GitHub(accessToken: "ghp_your_token_here")
 
-// Sin autenticación (solo endpoints públicos)
+// Without authentication (public endpoints only)
 let github = GitHub(type: .withoutToken)
 ```
 
-#### Repositorios
+#### Repositories
 
 ```swift
-// Obtener repositorios de un usuario
+// Get user repositories
 let repos = try await github.repositories(ownerID: "octocat")
 
-// Obtener un repositorio específico
+// Get a specific repository
 let repo = try await github.repository(ownerID: "octocat", repositoryName: "Hello-World")
 
-// Crear un repositorio
+// Create a repository
 let newRepo = NewRepository(
-    name: "nuevo-repo",
-    description: "Mi nuevo repositorio",
+    name: "new-repo",
+    description: "My new repository",
     private: false
 )
 try await github.createRepository(request: newRepo)
 
-// Buscar repositorios
+// Search repositories
 let results = try await github.searchRepositories(
     query: "swift toolkit",
     sort: .stars,
@@ -73,14 +73,14 @@ let results = try await github.searchRepositories(
 #### Pull Requests
 
 ```swift
-// Listar pull requests
+// List pull requests
 let pulls = try await github.pulls(
     ownerID: "owner",
     repositoryName: "repo",
     state: .open
 )
 
-// Obtener un PR específico
+// Get a specific PR
 let pr = try await github.pull(
     ownerID: "owner",
     repositoryName: "repo",
@@ -91,14 +91,14 @@ let pr = try await github.pull(
 #### Issues
 
 ```swift
-// Listar issues
+// List issues
 let issues = try await github.issues(
     ownerID: "owner",
     repositoryName: "repo",
     state: .open
 )
 
-// Buscar issues
+// Search issues
 let searchResults = try await github.searchIssues(
     query: "is:issue is:open label:bug"
 )
@@ -107,32 +107,32 @@ let searchResults = try await github.searchIssues(
 #### Releases
 
 ```swift
-// Obtener releases
+// Get releases
 let releases = try await github.releases(
     ownerID: "owner",
     repositoryName: "repo"
 )
 
-// Obtener la última release
+// Get latest release
 let latest = try await github.latestRelease(
     ownerID: "owner",
     repositoryName: "repo"
 )
 ```
 
-#### Usuarios
+#### Users
 
 ```swift
-// Obtener usuario actual
+// Get current user
 let me = try await github.me()
 
-// Obtener un usuario específico
+// Get a specific user
 let user = try await github.user(username: "octocat")
 
-// Buscar usuarios
+// Search users
 let users = try await github.searchUsers(query: "tom", sort: .followers)
 
-// Seguidores y siguiendo
+// Followers and following
 let followers = try await github.followers(username: "octocat")
 let following = try await github.following(username: "octocat")
 ```
@@ -140,39 +140,39 @@ let following = try await github.following(username: "octocat")
 #### OAuth
 
 ```swift
-// Autorizar con GitHub
+// Authorize with GitHub
 let authURL = try github.authorize(
-    clientID: "tu_client_id",
-    redirectURI: "tu_redirect_uri",
+    clientID: "your_client_id",
+    redirectURI: "your_redirect_uri",
     scopes: [.repo, .user, .gist]
 )
 
-// Abrir en el navegador
+// Open in browser
 UIApplication.shared.open(authURL)
 ```
 
 ### GitHub Actions Core
 
-#### Variables de Entorno
+#### Environment Variables
 
 ```swift
 import Core
 
-// Verificar si está ejecutándose en GitHub Actions
+// Check if running in GitHub Actions
 if Core.env.isRunningInGitHubActions() {
     print("Running in GitHub Actions!")
 }
 
-// Obtener información del workflow
+// Get workflow information
 let workflow = Core.env.getWorkflow()
 let repository = Core.env.getRepository()
 let event = Core.env.getEventName()
 ```
 
-#### Inputs y Outputs
+#### Inputs and Outputs
 
 ```swift
-// Leer inputs del workflow
+// Read workflow inputs
 let token = try Core.getInput(
     "github-token",
     options: InputOptions(required: true)
@@ -182,54 +182,54 @@ let verboseMode = Core.getBooleanInput("verbose")
 
 let tags = Core.getMultilineInput("tags")
 
-// Establecer outputs
+// Set outputs
 Core.setOutput(name: "status", value: "success")
 Core.setOutput(name: "result", value: "42")
 ```
 
-#### Logging y Anotaciones
+#### Logging and Annotations
 
 ```swift
-// Mensajes informativos
-Core.info(message: "Procesando archivos...")
+// Informational messages
+Core.info(message: "Processing files...")
 Core.debug(message: "Debug info: \(someVariable)")
 
-// Anotaciones
-Core.warning(message: "Este endpoint está deprecated", file: "main.swift", line: 42)
-Core.error(message: "Falló la validación", file: "validator.swift")
-Core.notice(message: "Se encontraron 3 warnings")
+// Annotations
+Core.warning(message: "This endpoint is deprecated", file: "main.swift", line: 42)
+Core.error(message: "Validation failed", file: "validator.swift")
+Core.notice(message: "Found 3 warnings")
 
-// Agrupar output
-Core.startGroup(name: "Instalando dependencias")
-// ... comandos ...
+// Group output
+Core.startGroup(name: "Installing dependencies")
+// ... commands ...
 Core.endGroup()
 
-// O con closure
+// Or with closure
 try Core.group(name: "Running Tests") {
-    // ... tu código aquí ...
+    // ... your code here ...
 }
 ```
 
-#### Resúmenes (Step Summaries)
+#### Summaries (Step Summaries)
 
 ```swift
-// Crear un resumen Markdown para el workflow
+// Create a Markdown summary for the workflow
 let summary = Core.summary
 
 summary
     .addHeading("Test Results", level: 1)
-    .addRaw("Se ejecutaron **150 tests**", addEOL: true)
+    .addRaw("Ran **150 tests**", addEOL: true)
     .addSeparator()
-    .addHeading("Estadísticas", level: 2)
+    .addHeading("Statistics", level: 2)
     .addList([
-        "✅ Pasaron: 145",
-        "❌ Fallaron: 5",
-        "⏭️ Omitidos: 0"
+        "✅ Passed: 145",
+        "❌ Failed: 5",
+        "⏭️ Skipped: 0"
     ])
     .addSeparator()
-    .addHeading("Cobertura de Código", level: 2)
+    .addHeading("Code Coverage", level: 2)
     .addTable([
-        ["Módulo", "Cobertura"],
+        ["Module", "Coverage"],
         ["Core", "95%"],
         ["GitHub API", "87%"],
         ["HttpClient", "100%"]
@@ -241,62 +241,62 @@ summary
     }
     """, language: "swift")
 
-// Escribir al archivo de resumen
+// Write to summary file
 try summary.write()
 
-// Limpiar el resumen
+// Clear summary
 try summary.clear()
 ```
 
-#### Estado y Secretos
+#### State and Secrets
 
 ```swift
-// Guardar estado entre steps
+// Save state between steps
 Core.saveState(name: "processedFiles", value: "file1.txt,file2.txt")
 
-// Recuperar estado en un step posterior
+// Retrieve state in a later step
 if let files = Core.getState(name: "processedFiles") {
-    print("Archivos procesados: \(files)")
+    print("Processed files: \(files)")
 }
 
-// Marcar valores como secretos (serán enmascarados en los logs)
-Core.setSecret("mi_token_secreto")
+// Mark values as secrets (will be masked in logs)
+Core.setSecret("my_secret_token")
 
-// Exportar variables de entorno
+// Export environment variables
 Core.exportVariable(name: "CUSTOM_VAR", value: "custom_value")
 
-// Agregar a PATH
+// Add to PATH
 Core.addPath("/usr/local/custom/bin")
 ```
 
-#### Marcar como Fallido
+#### Mark as Failed
 
 ```swift
-// Marcar el step como fallido
+// Mark the step as failed
 if validationFailed {
-    Core.setFailed(message: "La validación falló con 5 errores")
-    // Esto establece el exit code a 1
+    Core.setFailed(message: "Validation failed with 5 errors")
+    // This sets exit code to 1
 }
 ```
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 Sources/
-├── HttpClient/          # Cliente HTTP base
-│   ├── GitHub.swift     # Cliente principal
+├── HttpClient/          # Base HTTP client
+│   ├── GitHub.swift     # Main client
 │   ├── AuthorizationType.swift
 │   ├── RequestError.swift
 │   └── ...
-├── Github/              # API de GitHub
-│   ├── GitHubAPI/       # Endpoints organizados por categoría
+├── Github/              # GitHub API
+│   ├── GitHubAPI/       # Endpoints organized by category
 │   │   ├── Repositories/
 │   │   ├── Pull/
 │   │   ├── Issue/
 │   │   ├── User/
 │   │   ├── Releases/
 │   │   └── ...
-│   └── Models/          # Modelos de datos
+│   └── Models/          # Data models
 │       ├── Repository.swift
 │       ├── User.swift
 │       ├── Pull.swift
@@ -308,36 +308,36 @@ Sources/
 │   ├── Logger.swift
 │   ├── Summary.swift
 │   └── ...
-└── Github-toolkit/      # Paquete principal
+└── Github-toolkit/      # Main package
     └── Github_toolkit.swift
 ```
 
-## Endpoints Disponibles
+## Available Endpoints
 
-### Repositorios
-- Listar, buscar, crear, actualizar repositorios
-- Colaboradores, forks, stargazers
+### Repositories
+- List, search, create, update repositories
+- Collaborators, forks, stargazers
 - Tags, branches, contributors
-- Temas (topics), lenguajes
+- Topics, languages
 
 ### Pull Requests
-- Listar, obtener, buscar pull requests
-- Estados y reviews
+- List, get, search pull requests
+- States and reviews
 
 ### Issues
-- Listar, buscar issues
+- List, search issues
 - Labels, milestones, comments
 
 ### Releases
-- Listar releases y assets
-- Obtener release específico
+- List releases and assets
+- Get specific release
 
-### Usuarios
-- Perfil de usuario
-- Seguidores, siguiendo
-- Búsqueda de usuarios
+### Users
+- User profile
+- Followers, following
+- User search
 
-### Otros
+### Others
 - Discussions
 - Notifications
 - OAuth
@@ -345,20 +345,20 @@ Sources/
 - Gitignore templates
 - Search (global)
 
-## Modelos de Datos
+## Data Models
 
-Todos los modelos implementan `Codable` y usan `camelCase` automáticamente:
+All models implement `Codable` and use `camelCase` automatically:
 
-- `User`: Perfil completo de usuario
-- `Repository`: Información detallada del repositorio
-- `Pull`: Pull Request con metadata
-- `Issue`: Issue con labels, milestone, etc.
-- `Release`: Release con assets
+- `User`: Complete user profile
+- `Repository`: Detailed repository information
+- `Pull`: Pull Request with metadata
+- `Issue`: Issue with labels, milestone, etc.
+- `Release`: Release with assets
 - `Branch`, `Tag`, `Collaborator`
 - `Discussion`, `Notification`
-- Y muchos más...
+- And many more...
 
-## Manejo de Errores
+## Error Handling
 
 ```swift
 do {
@@ -366,100 +366,103 @@ do {
 } catch let error as RequestError {
     switch error {
     case .notFound:
-        print("Usuario no encontrado")
+        print("User not found")
     case .notAuthorized:
-        print("No autorizado - verifica tu token")
+        print("Not authorized - check your token")
     case .validationFailed(let message):
-        print("Error de validación: \(message)")
+        print("Validation error: \(message)")
     case .unknown(let statusCode):
-        print("Error desconocido: \(statusCode)")
+        print("Unknown error: \(statusCode)")
     }
 }
 ```
 
 ### Rate Limiting
 
-GitHub tiene límites en el número de requests que puedes hacer por hora. Este SDK incluye manejo automático de rate limiting:
+GitHub has limits on the number of requests you can make per hour. This SDK includes automatic rate limiting handling:
 
 ```swift
-// Configurar rate limiting con auto-retry
+// Configure rate limiting with auto-retry
 let options = RateLimitOptions(
-    autoRetry: true,         // Espera automáticamente cuando se alcanza el límite
-    maxRetries: 3,           // Máximo número de reintentos
-    throwOnLimit: false,     // No lanzar error, esperar y reintentar
-    warningThreshold: 0.8    // Advertir cuando se use el 80% del límite
+    autoRetry: true,         // Automatically wait when limit is reached
+    maxRetries: 3,           // Maximum number of retries
+    throwOnLimit: false,     // Don't throw error, wait and retry
+    warningThreshold: 0.8    // Warn when 80% of limit is used
 )
 
 let github = GitHub(
-    accessToken: "tu_token",
+    accessToken: "your_token",
     rateLimitOptions: options
 )
 
-// Verificar manualmente el rate limit antes de una request
+// Manually check rate limit before a request
 try await github.checkRateLimit()
 
-// Obtener información del rate limit actual
+// Get current rate limit information
 if let rateLimit = await github.getCurrentRateLimit() {
     print("Remaining: \(rateLimit.remaining)/\(rateLimit.limit)")
     print("Resets at: \(rateLimit.reset)")
     print("Usage: \(rateLimit.usagePercentage)%")
 }
 
-// Obtener estado completo del rate limit
+// Get complete rate limit status
 let status = try await github.getRateLimitStatus()
 print("Core API: \(status.resources.core.remaining)/\(status.resources.core.limit)")
 print("Search API: \(status.resources.search.remaining)/\(status.resources.search.limit)")
 print("GraphQL API: \(status.resources.graphql.remaining)/\(status.resources.graphql.limit)")
 ```
 
-El SDK automáticamente:
-- Extrae información de rate limit de los headers de respuesta
-- Advierte cuando te acercas al límite (configurable)
-- Puede esperar automáticamente y reintentar cuando se alcanza el límite
-- Lanza errores informativos con el tiempo de reset
+The SDK automatically:
+- Extracts rate limit information from response headers
+- Warns when approaching the limit (configurable)
+- Can automatically wait and retry when limit is reached
+- Throws informative errors with reset time
 
-## Requisitos
+## Requirements
 
 - Swift 5.8+
 - iOS 16.0+ / macOS 12.0+
 - Xcode 14.0+
 
-## Dependencias
+## Dependencies
 
-- [swift-http-types](https://github.com/apple/swift-http-types) - Sistema de tipos HTTP de Apple
+- [swift-http-types](https://github.com/apple/swift-http-types) - Apple's HTTP types system
 
-## Contribuir
+## Contributing
 
-Las contribuciones son bienvenidas. Por favor:
+Contributions are welcome. Please:
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## Licencia
+## License
 
-Este proyecto está bajo la licencia MIT. Ver el archivo `LICENSE` para más detalles.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-## Autor
+## Author
 
 **Asiel Cabrera Gonzalez**
 
-## Crear GitHub Actions con Swift
+## Creating GitHub Actions with Swift
 
-¿Quieres crear tus propias GitHub Actions usando Swift? Lee nuestra [**Guía Completa para Crear GitHub Actions con Swift**](GITHUB_ACTIONS_GUIDE.md).
+Want to create your own GitHub Actions using Swift? Check out our comprehensive guide and resources:
 
-La guía incluye:
-- Tutorial paso a paso
-- 3 ejemplos completos (básico, stats de repos, validador de PRs)
-- Mejores prácticas
-- Testing y debugging
-- Publicación en GitHub Marketplace
+- 📖 [**Complete Guide to Creating GitHub Actions with Swift**](GITHUB_ACTIONS_GUIDE.md) *(Spanish)*
+- 💡 [Basic Action Template](examples/basic-action/) - Ready to use as a starting point
 
-También puedes ver el [ejemplo básico](examples/basic-action/) listo para usar como template.
+The guide includes:
+- Step-by-step tutorial
+- 3 complete examples (basic action, repo stats, PR validator)
+- Best practices and patterns
+- Testing and debugging strategies
+- Publishing to GitHub Marketplace
 
-## Agradecimientos
+**Note**: The detailed guide is currently available in Spanish. The code examples and templates are universal and easy to follow regardless of language.
 
-- Basado en la API REST de GitHub v3
-- Inspirado en [@actions/core](https://github.com/actions/toolkit/tree/main/packages/core) y [@actions/github](https://github.com/actions/toolkit/tree/main/packages/github)
+## Acknowledgments
+
+- Based on GitHub REST API v3
+- Inspired by [@actions/core](https://github.com/actions/toolkit/tree/main/packages/core) and [@actions/github](https://github.com/actions/toolkit/tree/main/packages/github)

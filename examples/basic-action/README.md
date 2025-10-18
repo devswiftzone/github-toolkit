@@ -1,8 +1,8 @@
 # Basic Swift Action
 
-Un template básico para crear GitHub Actions con Swift usando github-toolkit.
+A basic template for creating GitHub Actions with Swift using github-toolkit.
 
-## Uso
+## Usage
 
 ```yaml
 - uses: username/basic-action@v1
@@ -27,48 +27,48 @@ Un template básico para crear GitHub Actions con Swift usando github-toolkit.
 | `message` | The generated greeting message |
 | `timestamp` | Timestamp of execution (ISO 8601) |
 
-## Desarrollo Local
+## Local Development
 
-### Requisitos
+### Requirements
 
 - Swift 5.8+
-- macOS 12+ o Ubuntu 22.04+
+- macOS 12+ or Ubuntu 22.04+
 
-### Compilar
+### Build
 
 ```bash
 swift build
 ```
 
-### Probar Localmente
+### Test Locally
 
 ```bash
-# Configurar environment
+# Configure environment
 export INPUT_NAME="Test User"
 export INPUT_GREETING="Hi"
 export INPUT_VERBOSE="true"
 export GITHUB_STEP_SUMMARY="/tmp/summary.md"
 export GITHUB_OUTPUT="/tmp/output.txt"
 
-# Ejecutar
+# Run
 swift run
 
-# Ver resultados
+# View results
 cat /tmp/summary.md
 cat /tmp/output.txt
 ```
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 basic-action/
 ├── Sources/
-│   └── main.swift       # Código principal del action
-├── Package.swift        # Configuración de dependencias
-├── action.yml          # Metadata del action
-└── README.md           # Este archivo
+│   └── main.swift       # Main action code
+├── Package.swift        # Dependencies configuration
+├── action.yml          # Action metadata
+└── README.md           # This file
 ```
 
-## Licencia
+## License
 
 MIT
