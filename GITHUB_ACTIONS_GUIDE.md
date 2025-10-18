@@ -1,98 +1,98 @@
-# Guía Completa: Crear GitHub Actions con Swift
+# Complete Guide: Creating GitHub Actions with Swift
 
-Esta guía te enseñará cómo crear GitHub Actions personalizadas usando Swift y el **GitHub Toolkit**.
+This guide will teach you how to create custom GitHub Actions using Swift and the **GitHub Toolkit**.
 
-## Tabla de Contenidos
+## Table of Contents
 
-1. [Introducción](#introducción)
-2. [Conceptos Básicos](#conceptos-básicos)
-3. [Estructura de un GitHub Action](#estructura-de-un-github-action)
-4. [Tutorial Paso a Paso](#tutorial-paso-a-paso)
-5. [Ejemplos Completos](#ejemplos-completos)
-6. [Mejores Prácticas](#mejores-prácticas)
-7. [Debugging y Testing](#debugging-y-testing)
-8. [Publicación](#publicación)
-
----
-
-## Introducción
-
-### ¿Por qué Swift para GitHub Actions?
-
-- ✅ **Type-Safe**: Swift es fuertemente tipado, reduciendo errores en tiempo de ejecución
-- ✅ **Async/Await**: Manejo nativo de operaciones asíncronas
-- ✅ **Rápido**: Rendimiento comparable a C++
-- ✅ **Moderno**: Características avanzadas del lenguaje
-- ✅ **Cross-Platform**: Compatible con Linux y macOS
-- ✅ **Ecosystem**: Acceso a Swift Package Manager
-
-### Ventajas del GitHub Toolkit
-
-El **github-toolkit** proporciona:
-- API completa de GitHub (REST)
-- Inputs/Outputs de workflow
-- Logging y anotaciones
-- Summaries (resúmenes Markdown)
-- Variables de entorno
-- Manejo de rate limiting
-- Y mucho más...
+1. [Introduction](#introduction)
+2. [Basic Concepts](#basic-concepts)
+3. [GitHub Action Structure](#github-action-structure)
+4. [Step-by-Step Tutorial](#step-by-step-tutorial)
+5. [Complete Examples](#complete-examples)
+6. [Best Practices](#best-practices)
+7. [Debugging and Testing](#debugging-and-testing)
+8. [Publishing](#publishing)
 
 ---
 
-## Conceptos Básicos
+## Introduction
 
-### Componentes de un GitHub Action
+### Why Swift for GitHub Actions?
 
-1. **`action.yml`**: Archivo de metadatos que define el action
-2. **Código Swift**: La lógica de tu action
-3. **Package.swift**: Dependencias y configuración del proyecto
-4. **Dockerfile** (opcional): Para actions que usan Docker
+- ✅ **Type-Safe**: Swift is strongly typed, reducing runtime errors
+- ✅ **Async/Await**: Native handling of asynchronous operations
+- ✅ **Fast**: Performance comparable to C++
+- ✅ **Modern**: Advanced language features
+- ✅ **Cross-Platform**: Compatible with Linux and macOS
+- ✅ **Ecosystem**: Access to Swift Package Manager
 
-### Tipos de GitHub Actions
+### GitHub Toolkit Advantages
 
-1. **Composite Actions**: Combinan múltiples steps (usaremos este tipo)
-2. **Docker Actions**: Se ejecutan en un contenedor Docker
-3. **JavaScript Actions**: Escritas en Node.js
+The **github-toolkit** provides:
+- Complete GitHub API (REST)
+- Workflow inputs/outputs
+- Logging and annotations
+- Summaries (Markdown summaries)
+- Environment variables
+- Rate limiting handling
+- And much more...
 
 ---
 
-## Estructura de un GitHub Action
+## Basic Concepts
 
-### Estructura de Directorios Recomendada
+### GitHub Action Components
+
+1. **`action.yml`**: Metadata file that defines the action
+2. **Swift Code**: Your action's logic
+3. **Package.swift**: Project dependencies and configuration
+4. **Dockerfile** (optional): For actions that use Docker
+
+### Types of GitHub Actions
+
+1. **Composite Actions**: Combine multiple steps (we'll use this type)
+2. **Docker Actions**: Run in a Docker container
+3. **JavaScript Actions**: Written in Node.js
+
+---
+
+## GitHub Action Structure
+
+### Recommended Directory Structure
 
 ```
 my-swift-action/
 ├── .github/
 │   └── workflows/
-│       └── test.yml          # Workflow para probar el action
+│       └── test.yml          # Workflow to test the action
 ├── Sources/
 │   └── MyAction/
-│       └── main.swift        # Código principal
-├── Package.swift             # Configuración SPM
-├── Package.resolved          # Lock file de dependencias
-├── action.yml                # Definición del action
-├── README.md                 # Documentación
-└── LICENSE                   # Licencia
+│       └── main.swift        # Main code
+├── Package.swift             # SPM configuration
+├── Package.resolved          # Dependencies lock file
+├── action.yml                # Action definition
+├── README.md                 # Documentation
+└── LICENSE                   # License
 ```
 
 ---
 
-## Tutorial Paso a Paso
+## Step-by-Step Tutorial
 
-### Paso 1: Crear el Proyecto Swift
+### Step 1: Create the Swift Project
 
 ```bash
-# Crear directorio
+# Create directory
 mkdir my-swift-action
 cd my-swift-action
 
-# Inicializar paquete Swift
+# Initialize Swift package
 swift package init --type executable --name MyAction
 ```
 
-### Paso 2: Configurar Package.swift
+### Step 2: Configure Package.swift
 
-Edita `Package.swift` para incluir el github-toolkit:
+Edit `Package.swift` to include github-toolkit:
 
 ```swift
 // swift-tools-version: 5.8
@@ -119,9 +119,9 @@ let package = Package(
 )
 ```
 
-### Paso 3: Escribir el Código del Action
+### Step 3: Write the Action Code
 
-Edita `Sources/main.swift`:
+Edit `Sources/main.swift`:
 
 ```swift
 import Foundation
@@ -132,7 +132,7 @@ import Github
 struct MyAction {
     static func main() async throws {
         // ====================================
-        // 1. LEER INPUTS
+        // 1. READ INPUTS
         // ====================================
 
         let name = try Core.getInput(
@@ -145,7 +145,7 @@ struct MyAction {
             options: InputOptions(required: false)
         )
 
-        // Input booleano
+        // Boolean input
         let verbose = Core.getBooleanInput("verbose")
 
         // ====================================
@@ -161,12 +161,12 @@ struct MyAction {
         }
 
         // ====================================
-        // 3. LÓGICA PRINCIPAL
+        // 3. MAIN LOGIC
         // ====================================
 
         Core.startGroup(name: "Processing")
 
-        // Simular trabajo
+        // Simulate work
         let result = processData(name: name, message: message)
 
         Core.info(message: "Processed: \(result)")
@@ -174,7 +174,7 @@ struct MyAction {
         Core.endGroup()
 
         // ====================================
-        // 4. CREAR SUMMARY
+        // 4. CREATE SUMMARY
         // ====================================
 
         let summary = Core.summary
@@ -200,14 +200,14 @@ struct MyAction {
         try summary.write()
 
         // ====================================
-        // 5. ESTABLECER OUTPUTS
+        // 5. SET OUTPUTS
         // ====================================
 
         Core.setOutput(name: "result", value: result)
         Core.setOutput(name: "timestamp", value: ISO8601DateFormatter().string(from: Date()))
 
         // ====================================
-        // 6. FINALIZAR
+        // 6. FINISH
         // ====================================
 
         Core.info(message: "Action completed successfully! ✅")
@@ -223,46 +223,46 @@ struct MyAction {
 }
 ```
 
-### Paso 4: Crear action.yml
+### Step 4: Create action.yml
 
-Crea el archivo `action.yml` en la raíz:
+Create the `action.yml` file in the root:
 
 ```yaml
 name: 'My Swift Action'
-description: 'Un GitHub Action personalizado escrito en Swift'
-author: 'Tu Nombre'
+description: 'A custom GitHub Action written in Swift'
+author: 'Your Name'
 
-# Icono y color que aparecerá en el marketplace
+# Icon and color that will appear in the marketplace
 branding:
   icon: 'code'
   color: 'orange'
 
-# Definir inputs
+# Define inputs
 inputs:
   name:
-    description: 'Nombre para saludar'
+    description: 'Name to greet'
     required: true
   message:
-    description: 'Mensaje adicional'
+    description: 'Additional message'
     required: false
     default: 'Welcome to Swift Actions!'
   verbose:
-    description: 'Activar modo verbose'
+    description: 'Enable verbose mode'
     required: false
     default: 'false'
 
-# Definir outputs
+# Define outputs
 outputs:
   result:
-    description: 'Resultado del procesamiento'
+    description: 'Processing result'
   timestamp:
-    description: 'Timestamp de ejecución'
+    description: 'Execution timestamp'
 
-# Configuración de ejecución
+# Execution configuration
 runs:
   using: 'composite'
   steps:
-    # Paso 1: Instalar Swift (en runners Ubuntu)
+    # Step 1: Install Swift (on Ubuntu runners)
     - name: Install Swift
       if: runner.os == 'Linux'
       run: |
@@ -274,14 +274,14 @@ runs:
         echo "/usr/share/swift/usr/bin" >> $GITHUB_PATH
       shell: bash
 
-    # Paso 2: Compilar el action
+    # Step 2: Build the action
     - name: Build Swift Action
       run: |
         cd ${{ github.action_path }}
         swift build -c release
       shell: bash
 
-    # Paso 3: Ejecutar el action
+    # Step 3: Run the action
     - name: Run Action
       env:
         INPUT_NAME: ${{ inputs.name }}
@@ -293,9 +293,9 @@ runs:
       shell: bash
 ```
 
-### Paso 5: Crear Workflow de Prueba
+### Step 5: Create Test Workflow
 
-Crea `.github/workflows/test.yml`:
+Create `.github/workflows/test.yml`:
 
 ```yaml
 name: Test Action
@@ -323,13 +323,13 @@ jobs:
           verbose: 'true'
 ```
 
-### Paso 6: Compilar y Probar Localmente
+### Step 6: Build and Test Locally
 
 ```bash
-# Compilar
+# Build
 swift build
 
-# Probar localmente (simular environment)
+# Test locally (simulate environment)
 export INPUT_NAME="Test User"
 export INPUT_MESSAGE="Hello from local test"
 export INPUT_VERBOSE="true"
@@ -337,15 +337,15 @@ export GITHUB_STEP_SUMMARY="/tmp/summary.md"
 
 swift run
 
-# Ver el summary generado
+# View generated summary
 cat /tmp/summary.md
 ```
 
 ---
 
-## Ejemplos Completos
+## Complete Examples
 
-### Ejemplo 1: Action que usa la API de GitHub
+### Example 1: Action that Uses the GitHub API
 
 ```swift
 import Foundation
@@ -355,16 +355,16 @@ import Github
 @main
 struct RepoStatsAction {
     static func main() async throws {
-        // Leer inputs
+        // Read inputs
         let token = try Core.getInput("github-token", options: InputOptions(required: true))
         let repo = try Core.getInput("repository", options: InputOptions(required: true))
 
-        // Ocultar el token en los logs
+        // Hide token in logs
         Core.setSecret(token)
 
         Core.info(message: "Fetching stats for \(repo)")
 
-        // Separar owner/repo
+        // Separate owner/repo
         let parts = repo.split(separator: "/")
         guard parts.count == 2 else {
             Core.setFailed(message: "Invalid repository format. Use: owner/repo")
@@ -374,20 +374,20 @@ struct RepoStatsAction {
         let owner = String(parts[0])
         let repoName = String(parts[1])
 
-        // Crear cliente GitHub
+        // Create GitHub client
         let github = GitHub(accessToken: token)
 
         Core.startGroup(name: "Fetching Repository Data")
 
         do {
-            // Obtener información del repositorio
+            // Get repository information
             let repository = try await github.repository(ownerID: owner, repositoryName: repoName)
 
             Core.info(message: "Repository: \(repository.fullName)")
             Core.info(message: "Stars: \(repository.stargazersCount ?? 0)")
             Core.info(message: "Forks: \(repository.forksCount ?? 0)")
 
-            // Obtener pull requests
+            // Get pull requests
             let pulls = try await github.pulls(
                 ownerID: owner,
                 repositoryName: repoName,
@@ -396,7 +396,7 @@ struct RepoStatsAction {
 
             Core.info(message: "Open PRs: \(pulls.count)")
 
-            // Obtener issues
+            // Get issues
             let issues = try await github.issues(
                 ownerID: owner,
                 repositoryName: repoName,
@@ -407,7 +407,7 @@ struct RepoStatsAction {
 
             Core.endGroup()
 
-            // Crear summary
+            // Create summary
             let summary = Core.summary
 
             summary
@@ -448,7 +448,7 @@ struct RepoStatsAction {
 }
 ```
 
-**action.yml correspondiente:**
+**Corresponding action.yml:**
 
 ```yaml
 name: 'Repository Stats'
@@ -478,7 +478,7 @@ runs:
     - name: Install Swift
       if: runner.os == 'Linux'
       run: |
-        # Instalar Swift...
+        # Install Swift...
       shell: bash
 
     - name: Build and Run
@@ -492,7 +492,7 @@ runs:
       shell: bash
 ```
 
-**Uso:**
+**Usage:**
 
 ```yaml
 - name: Get Repository Stats
@@ -502,7 +502,7 @@ runs:
     repository: 'devswiftzone/github-toolkit'
 ```
 
-### Ejemplo 2: Action con Rate Limiting
+### Example 2: Action with Rate Limiting
 
 ```swift
 import Foundation
@@ -519,7 +519,7 @@ struct BatchProcessorAction {
 
         Core.info(message: "Processing \(repos.count) repositories")
 
-        // Configurar rate limiting
+        // Configure rate limiting
         let rateLimitOptions = RateLimitOptions(
             autoRetry: true,
             maxRetries: 3,
@@ -534,7 +534,7 @@ struct BatchProcessorAction {
         for (index, repo) in repos.enumerated() {
             Core.info(message: "[\(index + 1)/\(repos.count)] Processing \(repo)")
 
-            // Verificar rate limit antes de cada request
+            // Check rate limit before each request
             if let rateLimit = await github.getCurrentRateLimit() {
                 Core.info(message: "Rate Limit: \(rateLimit.remaining)/\(rateLimit.limit)")
 
@@ -576,7 +576,7 @@ struct BatchProcessorAction {
 }
 ```
 
-### Ejemplo 3: Action con Validación de PRs
+### Example 3: Action with PR Validation
 
 ```swift
 import Foundation
@@ -588,7 +588,7 @@ struct PRValidatorAction {
     static func main() async throws {
         let token = try Core.getInput("github-token", options: InputOptions(required: true))
 
-        // Obtener info del PR desde el ambiente
+        // Get PR info from environment
         guard let eventPath = Core.env.getEventPath(),
               let eventData = try? Data(contentsOf: URL(fileURLWithPath: eventPath)),
               let event = try? JSONDecoder().decode(PullRequestEvent.self, from: eventData) else {
@@ -602,7 +602,7 @@ struct PRValidatorAction {
 
         var validations: [Validation] = []
 
-        // Validación 1: Título
+        // Validation 1: Title
         if event.pullRequest.title.count < 10 {
             validations.append(Validation(
                 name: "Title Length",
@@ -617,7 +617,7 @@ struct PRValidatorAction {
             ))
         }
 
-        // Validación 2: Descripción
+        // Validation 2: Description
         if let body = event.pullRequest.body, !body.isEmpty {
             validations.append(Validation(
                 name: "Has Description",
@@ -632,7 +632,7 @@ struct PRValidatorAction {
             ))
         }
 
-        // Validación 3: Tamaño del PR
+        // Validation 3: PR Size
         let changedFiles = event.pullRequest.changedFiles ?? 0
         if changedFiles > 20 {
             validations.append(Validation(
@@ -648,7 +648,7 @@ struct PRValidatorAction {
             ))
         }
 
-        // Crear summary
+        // Create summary
         let summary = Core.summary
         let passedCount = validations.filter { $0.passed }.count
         let totalCount = validations.count
@@ -666,7 +666,7 @@ struct PRValidatorAction {
 
         try summary.write()
 
-        // Reportar resultados
+        // Report results
         let allPassed = validations.allSatisfy { $0.passed }
 
         if allPassed {
@@ -712,12 +712,12 @@ struct Validation {
 
 ---
 
-## Mejores Prácticas
+## Best Practices
 
-### 1. Manejo de Errores
+### 1. Error Handling
 
 ```swift
-// ✅ BUENO - Manejo apropiado
+// ✅ GOOD - Proper handling
 do {
     let result = try await fetchData()
     Core.setOutput(name: "result", value: result)
@@ -726,14 +726,14 @@ do {
     return
 }
 
-// ❌ MALO - Force unwrap
-let result = try! fetchData()  // Puede crashear el action
+// ❌ BAD - Force unwrap
+let result = try! fetchData()  // Can crash the action
 ```
 
-### 2. Logging Apropiado
+### 2. Proper Logging
 
 ```swift
-// ✅ BUENO - Logging estructurado
+// ✅ GOOD - Structured logging
 Core.startGroup(name: "Data Processing")
 Core.info(message: "Processing \(items.count) items")
 
@@ -744,39 +744,39 @@ for item in items {
 
 Core.endGroup()
 
-// ❌ MALO - Sin contexto
-print("Processing...")  // No usa el sistema de logging de Actions
+// ❌ BAD - No context
+print("Processing...")  // Doesn't use Actions logging system
 ```
 
 ### 3. Secrets
 
 ```swift
-// ✅ BUENO - Marcar secrets
+// ✅ GOOD - Mark secrets
 let token = try Core.getInput("github-token", options: InputOptions(required: true))
-Core.setSecret(token)  // El token no aparecerá en los logs
+Core.setSecret(token)  // Token won't appear in logs
 
-// ❌ MALO - Exponer secrets
-Core.info(message: "Using token: \(token)")  // ¡Nunca hagas esto!
+// ❌ BAD - Expose secrets
+Core.info(message: "Using token: \(token)")  // Never do this!
 ```
 
-### 4. Inputs con Validación
+### 4. Inputs with Validation
 
 ```swift
-// ✅ BUENO - Validar inputs
+// ✅ GOOD - Validate inputs
 let timeout = try Core.getInput("timeout")
 guard let timeoutValue = Int(timeout), timeoutValue > 0, timeoutValue <= 3600 else {
     Core.setFailed(message: "timeout must be a number between 1 and 3600")
     return
 }
 
-// ❌ MALO - Asumir que el input es válido
-let timeout = Int(try Core.getInput("timeout"))!  // Puede crashear
+// ❌ BAD - Assume input is valid
+let timeout = Int(try Core.getInput("timeout"))!  // Can crash
 ```
 
-### 5. Summaries Informativos
+### 5. Informative Summaries
 
 ```swift
-// ✅ BUENO - Summary detallado
+// ✅ GOOD - Detailed summary
 let summary = Core.summary
 summary
     .addHeading("Results", level: 1)
@@ -795,43 +795,43 @@ summary
 
 try summary.write()
 
-// ❌ MALO - Summary vacío o poco útil
+// ❌ BAD - Empty or unhelpful summary
 Core.summary.addRaw("Done").write()
 ```
 
 ### 6. Rate Limiting
 
 ```swift
-// ✅ BUENO - Configurar rate limiting
+// ✅ GOOD - Configure rate limiting
 let options = RateLimitOptions(
     autoRetry: true,
     warningThreshold: 0.8
 )
 let github = GitHub(accessToken: token, rateLimitOptions: options)
 
-// Verificar antes de operaciones masivas
+// Check before bulk operations
 if let rateLimit = await github.getCurrentRateLimit() {
     if rateLimit.remaining < 100 {
         Core.warning(message: "Low rate limit: \(rateLimit.remaining)")
     }
 }
 
-// ❌ MALO - No considerar rate limits
-// Hacer cientos de requests sin verificar puede fallar
+// ❌ BAD - Don't consider rate limits
+// Making hundreds of requests without checking can fail
 ```
 
 ---
 
-## Debugging y Testing
+## Debugging and Testing
 
-### Testing Local
+### Local Testing
 
-Crea un script `test-local.sh`:
+Create a `test-local.sh` script:
 
 ```bash
 #!/bin/bash
 
-# Simular environment de GitHub Actions
+# Simulate GitHub Actions environment
 export INPUT_NAME="Test User"
 export INPUT_MESSAGE="Hello from test"
 export GITHUB_STEP_SUMMARY="/tmp/github-summary.md"
@@ -841,15 +841,15 @@ export GITHUB_ACTIONS="true"
 export GITHUB_WORKFLOW="Test Workflow"
 export GITHUB_REPOSITORY="owner/repo"
 
-# Crear archivos temporales
+# Create temporary files
 touch $GITHUB_STEP_SUMMARY
 touch $GITHUB_OUTPUT
 touch $GITHUB_ENV
 
-# Ejecutar
+# Execute
 swift run
 
-# Mostrar resultados
+# Show results
 echo ""
 echo "=== SUMMARY ==="
 cat $GITHUB_STEP_SUMMARY
@@ -862,20 +862,20 @@ echo ""
 echo "=== ENV ==="
 cat $GITHUB_ENV
 
-# Limpiar
+# Cleanup
 rm -f $GITHUB_STEP_SUMMARY $GITHUB_OUTPUT $GITHUB_ENV
 ```
 
-Ejecutar:
+Execute:
 
 ```bash
 chmod +x test-local.sh
 ./test-local.sh
 ```
 
-### Testing en CI
+### Testing in CI
 
-Crea `.github/workflows/ci.yml`:
+Create `.github/workflows/ci.yml`:
 
 ```yaml
 name: CI
@@ -906,42 +906,42 @@ jobs:
           message: 'Testing on ${{ matrix.os }}'
 ```
 
-### Debugging con Act
+### Debugging with Act
 
-[Act](https://github.com/nektos/act) permite ejecutar GitHub Actions localmente:
+[Act](https://github.com/nektos/act) allows you to run GitHub Actions locally:
 
 ```bash
-# Instalar act
+# Install act
 brew install act
 
-# Ejecutar workflow
+# Run workflow
 act -j test-action
 
-# Con secrets
+# With secrets
 act -j test-action -s GITHUB_TOKEN=ghp_xxxxx
 ```
 
 ---
 
-## Publicación
+## Publishing
 
-### 1. Versionado Semántico
+### 1. Semantic Versioning
 
-Usa tags para versionar tu action:
+Use tags to version your action:
 
 ```bash
-# Crear release
+# Create release
 git tag -a v1.0.0 -m "Release version 1.0.0"
 git push origin v1.0.0
 
-# Actualizar major version tag
+# Update major version tag
 git tag -fa v1 -m "Update v1 tag"
 git push origin v1 --force
 ```
 
 ### 2. GitHub Marketplace
 
-1. Agrega metadata a `action.yml`:
+1. Add metadata to `action.yml`:
 
 ```yaml
 name: 'My Swift Action'
@@ -949,15 +949,15 @@ description: 'Detailed description of what your action does'
 author: 'Your Name'
 
 branding:
-  icon: 'code'  # Ver: https://feathericons.com
+  icon: 'code'  # See: https://feathericons.com
   color: 'orange'  # blue, green, orange, red, purple, gray-dark
 ```
 
-2. Crea un README completo
+2. Create a complete README
 
-3. Ve a tu repositorio → Releases → "Draft a new release"
+3. Go to your repository → Releases → "Draft a new release"
 
-4. Marca "Publish this Action to the GitHub Marketplace"
+4. Check "Publish this Action to the GitHub Marketplace"
 
 ### 3. README Template
 
@@ -1016,39 +1016,39 @@ MIT
 
 ---
 
-## Recursos Adicionales
+## Additional Resources
 
-### Documentación
+### Documentation
 
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Creating Actions](https://docs.github.com/en/actions/creating-actions)
 - [Swift.org](https://swift.org)
 
-### Repositorios de Ejemplo
+### Example Repositories
 
-- [Test_Github_Action](https://github.com/asielcabrera/Test_Github_Action) - Action simple
-- [github-toolkit](https://github.com/devswiftzone/github-toolkit) - El toolkit completo
+- [Test_Github_Action](https://github.com/asielcabrera/Test_Github_Action) - Simple action
+- [github-toolkit](https://github.com/devswiftzone/github-toolkit) - The complete toolkit
 
-### Comunidad
+### Community
 
 - [GitHub Community](https://github.community)
 - [Swift Forums](https://forums.swift.org)
 
 ---
 
-## Conclusión
+## Conclusion
 
-Crear GitHub Actions con Swift es una forma poderosa y type-safe de automatizar workflows. Con el **github-toolkit**, tienes acceso a:
+Creating GitHub Actions with Swift is a powerful and type-safe way to automate workflows. With the **github-toolkit**, you have access to:
 
-- ✅ API completa de GitHub
-- ✅ Inputs/Outputs manejados
-- ✅ Logging profesional
-- ✅ Summaries ricos en Markdown
-- ✅ Rate limiting inteligente
-- ✅ Y mucho más...
+- ✅ Complete GitHub API
+- ✅ Managed inputs/outputs
+- ✅ Professional logging
+- ✅ Rich Markdown summaries
+- ✅ Intelligent rate limiting
+- ✅ And much more...
 
-¡Empieza a construir tus propios actions hoy!
+Start building your own actions today!
 
 ---
 
-**¿Preguntas o problemas?** Abre un issue en [github-toolkit](https://github.com/devswiftzone/github-toolkit/issues)
+**Questions or issues?** Open an issue at [github-toolkit](https://github.com/devswiftzone/github-toolkit/issues)
