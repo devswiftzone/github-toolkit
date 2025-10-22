@@ -6,6 +6,9 @@
 //
 
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public struct GitHub: Sendable {
   public var baseURL = URL(string: "https://api.github.com")!
