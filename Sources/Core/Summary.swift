@@ -292,6 +292,6 @@ public class Summary {
     }
 }
 
-extension Core {
+public extension Core {
     static var summary: Summary { Summary() }
 }
