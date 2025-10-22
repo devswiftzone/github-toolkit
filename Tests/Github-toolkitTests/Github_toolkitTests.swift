@@ -1,4 +1,5 @@
 import Testing
+import Foundation
 @testable import Github_toolkit
 @testable import HttpClient
 @testable import Core
@@ -187,7 +188,18 @@ func testUserModelDecoding() throws {
         "login": "testuser",
         "node_id": "MDQ6VXNlcjE=",
         "avatar_url": "https://github.com/images/error/testuser_happy.gif",
+        "gravatar_id": "",
         "url": "https://api.github.com/users/testuser",
+        "html_url": "https://github.com/testuser",
+        "followers_url": "https://api.github.com/users/testuser/followers",
+        "following_url": "https://api.github.com/users/testuser/following{/other_user}",
+        "gists_url": "https://api.github.com/users/testuser/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/testuser/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/testuser/subscriptions",
+        "organizations_url": "https://api.github.com/users/testuser/orgs",
+        "repos_url": "https://api.github.com/users/testuser/repos",
+        "events_url": "https://api.github.com/users/testuser/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/testuser/received_events",
         "type": "User",
         "site_admin": false
     }
@@ -195,11 +207,10 @@ func testUserModelDecoding() throws {
 
     let data = json.data(using: .utf8)!
     let decoder = JSONDecoder()
-    decoder.keyDecodingStrategy = .convertFromSnakeCase
 
     let user = try decoder.decode(User.self, from: data)
     #expect(user.id == 1)
-    #expect(user.login == "testuser")
+    #expect(user.userID == "testuser")
     #expect(user.siteAdmin == false)
 }
 
