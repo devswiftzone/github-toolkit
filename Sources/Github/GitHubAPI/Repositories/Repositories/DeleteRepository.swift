@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
 import HttpClient
 import HTTPTypes
 
@@ -28,11 +25,10 @@ extension GitHub {
     let method: HTTPRequest.Method = .delete
     
     let request = HTTPRequest(method: method, url: endpoint, queries: [:], headers: headers)
-    
-    let (data, httpResponse) = try await session.data(for: request)
-            
-    if httpResponse.status.code != 204 {
-      throw RequestError.deleteRepository(data: data)
-    }
+
+    let (_, _) = try await execute(request)
+
+    // El status code 204 ya es manejado por el método execute()
+    // Si llegamos aquí, la operación fue exitosa
   }
 }

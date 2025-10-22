@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
 import HttpClient
 import HTTPTypes
 
@@ -48,7 +45,7 @@ extension GitHub {
     
     let request = HTTPRequest(method: method, url: endpoint, queries: queries, headers: headers)
     
-    let (data, _) = try await session.data(for: request)
+    let (data, _) = try await execute( request)
     
     let comments = try decode([Comment].self, from: data)
     

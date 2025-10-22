@@ -6,33 +6,47 @@
 //
 
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
+import AsyncHTTPClient
+import HTTPTypes
+import NIOCore
+import NIOHTTP1
 
 public struct GitHub: Sendable {
   public var baseURL = URL(string: "https://api.github.com")!
   public var authorizationType: AuthorizationType
-  public var session: URLSession
+  public let httpClient: HTTPClient
   public let rateLimitHandler: RateLimitHandler
+  private let ownsClient: Bool
 
   public init(
     type authorizationType: AuthorizationType,
-    session: URLSession = .shared,
+    httpClient: HTTPClient? = nil,
     rateLimitOptions: RateLimitOptions = .default
   ) {
     self.authorizationType = authorizationType
-    self.session = session
+    if let httpClient = httpClient {
+      self.httpClient = httpClient
+      self.ownsClient = false
+    } else {
+      self.httpClient = HTTPClient(eventLoopGroupProvider: .singleton)
+      self.ownsClient = true
+    }
     self.rateLimitHandler = RateLimitHandler(options: rateLimitOptions)
   }
 
   public init(
     accessToken: String,
-    session: URLSession = .shared,
+    httpClient: HTTPClient? = nil,
     rateLimitOptions: RateLimitOptions = .default
   ) {
     self.authorizationType = .bearerToken(accessToken: accessToken)
-    self.session = session
+    if let httpClient = httpClient {
+      self.httpClient = httpClient
+      self.ownsClient = false
+    } else {
+      self.httpClient = HTTPClient(eventLoopGroupProvider: .singleton)
+      self.ownsClient = true
+    }
     self.rateLimitHandler = RateLimitHandler(options: rateLimitOptions)
   }
 
@@ -58,5 +72,14 @@ public struct GitHub: Sendable {
    */
   public func checkRateLimit() async throws {
     try await rateLimitHandler.shouldProceed()
+  }
+
+  /**
+   * Cierra el cliente HTTP si fue creado internamente.
+   */
+  public func shutdown() async throws {
+    if ownsClient {
+      try await httpClient.shutdown()
+    }
   }
 }

@@ -16,7 +16,8 @@ let package = Package(
         .library(name: "Github", targets: ["Github"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-http-types", .upToNextMajor(from: "0.1.1"))
+        .package(url: "https://github.com/apple/swift-http-types", .upToNextMajor(from: "0.1.1")),
+        .package(url: "https://github.com/swift-server/async-http-client.git", from: "1.9.0")
     ],
     targets: [
         
@@ -42,6 +43,7 @@ let package = Package(
             dependencies: [
                 .product(name: "HTTPTypes", package: "swift-http-types"),
                 .product(name: "HTTPTypesFoundation", package: "swift-http-types"),
+                .product(name: "AsyncHTTPClient", package: "async-http-client"),
             ]
         ),
         .testTarget(

@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
 import HttpClient
 import HTTPTypes
 
@@ -44,12 +41,10 @@ extension GitHub {
     }
     
     let bodyData = try JSONEncoder().encode(body)
-    
-    let httpRequest = HTTPRequest(method: method, url: endpoint, queries: [:], headers: headers)
-    var urlRequest = URLRequest(httpRequest: httpRequest)!
-    urlRequest.httpBody = bodyData
-    
-    let (data, _) = try await session.data(for: urlRequest)
+
+    let request = HTTPRequest(method: method, url: endpoint, queries: [:], headers: headers)
+
+    let (data, _) = try await execute(request, body: bodyData)
     
     let repository = try decode(Repository.self, from: data)
     

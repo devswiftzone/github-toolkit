@@ -6,78 +6,34 @@
 //
 
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
+import AsyncHTTPClient
+import HTTPTypes
+import NIOCore
 
+@available(macOS 13.0, *)
 extension GitHub {
-    /**
-     * Procesa una respuesta HTTP y actualiza el rate limit.
-     *
-     * - Parameter response: La respuesta HTTP.
-     */
-    public func processRateLimitHeaders(from response: HTTPURLResponse) async {
-        // Convertir headers a diccionario [String: String]
-        let headers = response.allHeaderFields.reduce(into: [String: String]()) { result, element in
-            if let key = element.key as? String, let value = element.value as? String {
-                result[key] = value
-            }
-        }
-
-        await rateLimitHandler.update(from: headers)
-    }
-
-    /**
-     * Maneja errores de rate limit (código 429).
-     *
-     * - Parameters:
-     *   - response: La respuesta HTTP.
-     *   - retry: Closure que se ejecutará después de esperar el tiempo necesario.
-     * - Returns: El resultado del retry si se configuró autoRetry, o lanza un error.
-     */
-    public func handleRateLimitError(
-        from response: HTTPURLResponse,
-        retry: () async throws -> (Data, URLResponse)
-    ) async throws -> (Data, URLResponse) {
-        let headers = response.allHeaderFields.reduce(into: [String: String]()) { result, element in
-            if let key = element.key as? String, let value = element.value as? String {
-                result[key] = value
-            }
-        }
-
-        let retryAfter = headers["Retry-After"] ?? headers["retry-after"]
-
-        // Intentar manejar el error 429
-        try await rateLimitHandler.handle429Response(retryAfter: retryAfter)
-
-        // Si llegamos aquí, el handler está configurado para reintentar
-        return try await retry()
-    }
-
     /**
      * Obtiene el estado actual del rate limit consultando el endpoint /rate_limit.
      *
      * - Returns: Información completa del rate limit.
      */
     public func getRateLimitStatus() async throws -> RateLimitStatus {
-        // Create endpoint URL using appendingPathComponent for compatibility
-        let endpoint = baseURL.appendingPathComponent("rate_limit")
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "GET"
+        // Crear la petición HTTP
+        let path = "/rate_limit"
+        let endpoint = baseURL.appendingPathComponent(path)
+        let method: HTTPRequest.Method = .get
 
-        // Agregar headers de autenticación
-        for (key, value) in headers {
-            request.setValue(value, forHTTPHeaderField: key)
-        }
+        let request = HTTPRequest(
+            method: method,
+            url: endpoint,
+            queries: [:],
+            headers: headers
+        )
 
-        // Use async/await API
-        let (data, response) = try await session.data(for: request)
+        // Ejecutar la request
+        let (data, _) = try await execute(request)
 
-        // Actualizar rate limit desde headers
-        if let httpResponse = response as? HTTPURLResponse {
-            await processRateLimitHeaders(from: httpResponse)
-        }
-
+        // Decodificar la respuesta
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return try decoder.decode(RateLimitStatus.self, from: data)

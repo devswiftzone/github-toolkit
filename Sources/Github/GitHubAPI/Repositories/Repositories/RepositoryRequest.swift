@@ -6,9 +6,6 @@
 //
 
 import Foundation
-#if canImport(FoundationNetworking)
-import FoundationNetworking
-#endif
 import HttpClient
 import HTTPTypes
 
@@ -35,7 +32,7 @@ extension GitHub {
       headers: headers
     )
     
-    let (data, _) = try await session.data(for: request)
+    let (data, _) = try await execute( request)
     
     let repository = try decode(Repository.self, from: data)
     
