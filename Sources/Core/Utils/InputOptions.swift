@@ -15,7 +15,7 @@ public struct InputOptions {
     /** Optional. Whether leading/trailing whitespace will be trimmed for the input. Defaults to true */
     public let trimWhitespace: Bool?
     
-    public init(required: Bool?, trimWhitespace: Bool?) {
+    public init(required: Bool? = false, trimWhitespace: Bool? = true) {
         self.required = required
         self.trimWhitespace = trimWhitespace
     }
